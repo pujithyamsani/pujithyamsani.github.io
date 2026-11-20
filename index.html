@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yamsani Pujith | Data Engineer</title>
+<meta name="description" content="Yamsani Pujith, Data Engineer in Hyderabad. Builds Azure data pipelines for PepsiCo with Azure Databricks, Azure Data Factory, PySpark and SQL.">
+<meta name="author" content="Yamsani Pujith">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Yamsani Pujith | Data Engineer">
+<meta property="og:description" content="Yamsani Pujith, Data Engineer in Hyderabad. Builds Azure data pipelines for PepsiCo with Azure Databricks, Azure Data Factory, PySpark and SQL.">
+<meta name="theme-color" content="#ECEFF2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D141A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2313202A'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23D58F5A'/%3E%3Crect x='13.5' y='11' width='5' height='15' rx='1' fill='%23B2BDC7'/%3E%3Crect x='21' y='6' width='5' height='20' rx='1' fill='%23DDB740'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* Layout: control-room schematic. A live pipeline console is the hero; work follows on a 12-column grid over a faint dot grid. Bronze, silver and gold (the Medallion layers) mark data maturity everywhere. */
+  --bg:#ECEFF2;
+  --panel:#FAFBFC;
+  --ink:#13202A;
+  --muted:#55636F;
+  --rule:#C9D1D9;
+  --dot:rgba(19,32,42,.10);
+  --flow:#1B6AA3;
+  --flow-soft:rgba(27,106,163,.10);
+  --bronze:#985A2E;
+  --silver:#6B7783;
+  --gold:#9A770B;
+  --ok:#217E4B;
+  --ok-soft:rgba(33,126,75,.13);
+  --bad:#BC3A2B;
+  --bad-soft:rgba(188,58,43,.12);
+  --shadow:rgba(19,32,42,.16);
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D141A; --panel:#131C23; --ink:#E3E9EE; --muted:#93A0AC; --rule:#283540; --dot:rgba(227,233,238,.07);
+    --flow:#5DAFE4; --flow-soft:rgba(93,175,228,.14);
+    --bronze:#D58F5A; --silver:#B2BDC7; --gold:#DDB740;
+    --ok:#5CC98C; --ok-soft:rgba(92,201,140,.15); --bad:#F0705F; --bad-soft:rgba(240,112,95,.15);
+    --shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D141A; --panel:#131C23; --ink:#E3E9EE; --muted:#93A0AC; --rule:#283540; --dot:rgba(227,233,238,.07);
+  --flow:#5DAFE4; --flow-soft:rgba(93,175,228,.14);
+  --bronze:#D58F5A; --silver:#B2BDC7; --gold:#DDB740;
+  --ok:#5CC98C; --ok-soft:rgba(92,201,140,.15); --bad:#F0705F; --bad-soft:rgba(240,112,95,.15);
+  --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+a{color:var(--flow)}
+:focus-visible{outline:2px solid var(--flow);outline-offset:2px}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:720px){.wrap{padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px))}}
+.mono{font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+.tri{display:inline-flex;gap:3px}
+.tri i{display:block;width:var(--tw,22px);height:var(--th,5px);border-radius:1px}
+.tri i:nth-child(1){background:var(--bronze)}
+.tri i:nth-child(2){background:var(--silver)}
+.tri i:nth-child(3){background:var(--gold)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13.5px;font-weight:500;line-height:1;padding:11px 16px;border-radius:4px;border:1px solid var(--ink);background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;transition:background-color .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--flow-soft)}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.primary:hover{background:var(--flow);border-color:var(--flow);color:var(--bg)}
+.btn.small{padding:7px 11px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}
+@supports (backdrop-filter:blur(6px)){.top{background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px)}}
+.top .wrap{display:flex;align-items:center;gap:24px;min-height:56px}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.02em}
+.brand .tri{align-items:flex-end;--tw:5px}
+.brand .tri i:nth-child(1){height:8px}
+.brand .tri i:nth-child(2){height:12px}
+.brand .tri i:nth-child(3){height:16px}
+.links{display:flex;gap:22px;margin-left:auto}
+.links a{font-family:var(--mono);font-size:13px;color:var(--muted);text-decoration:none;padding-block:4px}
+.links a:hover{color:var(--ink)}
+.theme-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:6px 12px;cursor:pointer}
+.theme-btn:hover{border-color:var(--muted)}
+.theme-btn svg{width:14px;height:14px}
+@media (max-width:760px){.links{display:none}.theme-btn{margin-left:auto}}
+
+/* hero */
+.hero{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1px,transparent 1.3px);background-size:20px 20px;border-bottom:1px solid var(--rule)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;padding-block:64px 64px;align-items:center}
+@media (max-width:980px){.hero .wrap{grid-template-columns:minmax(0,1fr);gap:40px;padding-block:44px 48px}}
+.intro{min-width:0}
+.name{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(2.6rem,6.2vw,4.9rem);line-height:.9;letter-spacing:-.02em;margin:16px 0 18px}
+.name span{display:block}
+.intro .tri{--tw:34px;--th:6px;margin-bottom:26px}
+.lede{font-size:clamp(1.12rem,1.6vw,1.3rem);line-height:1.45;max-width:30ch;margin:0 0 26px;text-wrap:pretty}
+.facts{list-style:none;margin:0 0 30px;padding:0;display:grid;max-width:460px}
+.facts li{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;font-size:15px;border-top:1px solid var(--rule);padding-block:7px}
+.facts li:last-child{border-bottom:1px solid var(--rule)}
+.facts .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.facts .v{min-width:0;overflow-wrap:anywhere}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+
+/* pipeline console */
+.console{background:var(--panel);border:1px solid var(--rule);border-radius:6px;box-shadow:0 22px 48px -30px var(--shadow);min-width:0;overflow:hidden}
+.console-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.status{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;padding:2px 9px;border-radius:999px;border:1px solid currentColor;color:var(--muted);line-height:1.5}
+.status[data-s="running"]{color:var(--flow);background:var(--flow-soft)}
+.status[data-s="ok"]{color:var(--ok);background:var(--ok-soft)}
+.hint{margin:0;padding:12px 14px 0;font-size:14px;color:var(--muted)}
+.canvas-box{padding:6px 0 0}
+.canvas-box canvas{display:block;width:100%;height:236px;touch-action:manipulation}
+.legend{display:flex;flex-wrap:wrap;gap:6px;padding:4px 14px 6px}
+.legend button{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:999px;padding:4px 10px;cursor:pointer}
+.legend button:hover{border-color:var(--muted)}
+.legend button[aria-pressed="true"]{border-color:var(--flow);background:var(--flow-soft)}
+.legend .sw{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.stage-note{margin:0;padding:6px 14px 14px;font-size:14.5px;min-height:4.4em}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:12px 14px;border-top:1px solid var(--rule)}
+.switch{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--ink);cursor:pointer;user-select:none}
+.switch input{appearance:none;-webkit-appearance:none;width:36px;height:20px;border-radius:999px;background:var(--rule);position:relative;cursor:pointer;margin:0;transition:background-color .2s;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--panel);transition:transform .2s}
+.switch input:checked{background:var(--bad)}
+.switch input:checked::after{transform:translateX(16px)}
+.counters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--rule)}
+.counters div{padding:10px 14px;min-width:0}
+.counters div + div{border-left:1px solid var(--rule)}
+.counters dt{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.counters dd{margin:0;font-family:var(--display);font-stretch:112%;font-weight:700;font-size:1.65rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.counters .rej dd{color:var(--bad)}
+.counters .pub dd{color:var(--ok)}
+.log{list-style:none;margin:0;padding:10px 14px 12px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--ink);height:8.4em;overflow-y:auto;background:var(--bg)}
+.log .t{color:var(--muted)}
+.log .ok{color:var(--ok)}
+.log .bad{color:var(--bad)}
+
+/* sections */
+.block{padding-block:88px;border-bottom:1px solid var(--rule);scroll-margin-top:56px}
+@media (max-width:720px){.block{padding-block:56px}}
+.sec-head{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:14px 48px;align-items:end;margin-bottom:40px}
+@media (max-width:860px){.sec-head{grid-template-columns:minmax(0,1fr)}}
+h2{font-family:var(--display);font-stretch:115%;font-weight:750;font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1.02;letter-spacing:-.015em;margin:10px 0 0;text-wrap:balance}
+.sec-intro{margin:0;color:var(--muted);font-size:1.06rem;max-width:62ch;text-wrap:pretty}
+h3{font-family:var(--display);font-stretch:108%;font-weight:700;font-size:1.4rem;line-height:1.15;margin:0;text-wrap:balance}
+
+/* experience */
+.job{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:28px 48px;padding-top:28px;border-top:2px solid var(--ink)}
+@media (max-width:860px){.job{grid-template-columns:minmax(0,1fr)}}
+.org{margin:6px 0 0;font-weight:600}
+.client{margin:2px 0 0;color:var(--muted)}
+.client strong{color:var(--ink)}
+.kv{margin:20px 0 0;font-family:var(--mono);max-width:360px}
+.kv div{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--rule);font-size:13.5px}
+.kv dt{color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-size:11px}
+.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.ticks{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.ticks li{position:relative;padding-left:22px;max-width:70ch}
+.ticks li::before{content:"";position:absolute;left:2px;top:.6em;width:8px;height:8px;background:var(--flow);border-radius:1px}
+
+/* projects */
+.projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+@media (max-width:980px){.projects{grid-template-columns:minmax(0,1fr)}}
+.project{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:28px;display:flex;flex-direction:column;gap:20px;min-width:0}
+@media (max-width:520px){.project{padding:20px}}
+.project .pl{margin:8px 0 0;color:var(--muted)}
+.lineage{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 4px;font-family:var(--mono);font-size:12px}
+.lineage li{display:inline-flex;align-items:center;gap:4px}
+.lineage li + li::before{content:"\2192";color:var(--muted);margin-right:4px}
+.lineage span{border:1px solid var(--rule);border-top:3px solid var(--c,var(--rule));border-radius:3px;padding:3px 8px;background:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.stats div{display:flex;flex-direction:column-reverse;gap:4px;padding:14px 0;min-width:0}
+.stats div + div{padding-left:20px;border-left:1px solid var(--rule)}
+.stats dd{margin:0;font-family:var(--display);font-stretch:112%;font-weight:750;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.stats dt{font-size:13.5px;color:var(--muted)}
+.project .ticks{gap:10px}
+.project .ticks li{font-size:15px}
+.stack{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.stack li{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--rule);border-radius:999px;padding:3px 10px}
+
+/* reconciliation */
+.recon{border:1px solid var(--rule);border-radius:4px;padding:16px;background:var(--bg)}
+.recon-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-family:var(--mono);font-size:13px;margin-bottom:14px}
+.recon-head .vs{color:var(--muted)}
+.recon-head .btn{margin-left:auto}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-size:14.5px}
+.checks li{display:flex;align-items:center;gap:10px;transition:color .2s}
+.mark{position:relative;flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--rule);transition:background-color .2s,border-color .2s}
+.mark::after{content:"";position:absolute;left:5px;top:2px;width:4px;height:8px;border:solid var(--panel);border-width:0 2px 2px 0;transform:rotate(45deg);opacity:0}
+.checks li[data-state="pending"]{color:var(--muted)}
+.checks li[data-state="running"] .mark{border-color:var(--flow);border-right-color:transparent;animation:spin .7s linear infinite}
+.checks li[data-state="done"] .mark{background:var(--ok);border-color:var(--ok)}
+.checks li[data-state="done"] .mark::after{opacity:1}
+.recon-result{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--rule);font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--ok)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* skills console */
+.sql{background:var(--panel);border:1px solid var(--rule);border-radius:6px;overflow:hidden;min-width:0}
+.sql-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.sql-tabs button{font-family:var(--mono);font-size:12.5px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:3px;padding:5px 10px;cursor:pointer}
+.sql-tabs button:hover{border-color:var(--muted)}
+.sql-tabs button[aria-pressed="true"]{background:var(--flow);border-color:var(--flow);color:var(--panel)}
+.sql-query{margin:0;padding:18px 16px;font-family:var(--mono);font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;border-bottom:1px solid var(--rule);min-height:7.4em;background:var(--bg);color:var(--ink)}
+.sql-query .k{color:var(--flow);font-weight:600}
+.sql-query .s{color:var(--bronze)}
+.caret{display:inline-block;width:.55em;height:1.1em;background:var(--flow);vertical-align:-.2em;margin-left:1px}
+.sql-result{overflow-x:auto}
+.sql table{width:100%;border-collapse:collapse;font-size:14.5px}
+.sql th{font-family:var(--mono);font-size:12px;font-weight:500;text-align:left;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.sql td{padding:10px 16px;border-bottom:1px solid var(--rule);vertical-align:top}
+.sql td:first-child{font-weight:600}
+.sql tbody.stale{opacity:.35}
+.sql tbody tr.in{animation:rowin .32s ease both;animation-delay:calc(var(--r) * 45ms)}
+@keyframes rowin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sql-foot{padding:10px 16px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* education */
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.timeline li{position:relative;padding:30px 24px 0 0;border-top:2px solid var(--rule);min-width:0}
+.timeline li::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px var(--bg)}
+.timeline .yr{display:block;font-family:var(--display);font-stretch:115%;font-weight:750;font-size:1.9rem;line-height:1;margin-bottom:10px;font-variant-numeric:tabular-nums}
+.timeline b{display:block;font-weight:600;margin-bottom:2px}
+.timeline .where{display:block;color:var(--muted);font-size:14.5px}
+.timeline .score{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:12.5px;border:1px solid var(--rule);border-radius:3px;padding:2px 8px}
+@media (max-width:860px){
+  .timeline{grid-template-columns:minmax(0,1fr);border-left:2px solid var(--rule);margin-left:6px}
+  .timeline li{border-top:0;padding:0 0 30px 26px}
+  .timeline li:last-child{padding-bottom:0}
+  .timeline li::before{top:6px;left:-7px}
+}
+.cert{margin-top:48px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;padding:22px 24px;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+.badge{width:54px;height:60px;flex:none;display:grid;place-items:center;background:var(--flow);color:var(--panel);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);font-family:var(--mono);font-weight:600;font-size:15px}
+.cert-text{flex:1 1 260px;min-width:0}
+.cert-text h3{font-size:1.2rem}
+.cert-text p{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+
+/* contact */
+.contact .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:32px 56px;align-items:end}
+@media (max-width:860px){.contact .wrap{grid-template-columns:minmax(0,1fr)}}
+.contact h2{font-size:clamp(2.2rem,5vw,3.8rem)}
+.contact .sec-intro{margin-top:18px}
+.reach{display:grid;gap:12px;min-width:0}
+.reach-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:14px 16px;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+.reach-row > div{min-width:0}
+.reach-row .lbl{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.reach-row .val{font-family:var(--mono);font-size:15px;user-select:all;overflow-wrap:anywhere}
+
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding-block:28px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#pipeline"><span class="tri" aria-hidden="true"><i></i><i></i><i></i></span>Yamsani Pujith</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+      <a href="Yamsani_Pujith_Resume.pdf" download>Resume &#8595;</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch theme">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg>
+      <span class="tl">Dark</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="pipeline">
+    <div class="wrap">
+      <div class="intro">
+        <p class="eyebrow">Data Engineer &middot; Hyderabad, India</p>
+        <h1 class="name"><span>Yamsani</span><span>Pujith</span></h1>
+        <span class="tri" aria-hidden="true"><i></i><i></i><i></i></span>
+        <p class="lede">I build data pipelines that turn raw business data into reports people can trust.</p>
+        <ul class="facts">
+          <li><span class="k">Now</span><span class="v">Data Engineer, Cliff Systems LLP</span></li>
+          <li><span class="k">Client</span><span class="v">PepsiCo</span></li>
+          <li><span class="k">Certified</span><span class="v">Microsoft Azure Data Engineer Associate</span></li>
+          <li><span class="k">Email</span><span class="v mono" id="heroEmail">pujithyamsani06@gmail.com</span></li>
+        </ul>
+        <div class="cta">
+          <a class="btn primary" href="#projects">See my projects</a>
+          <button class="btn" type="button" data-copy="pujithyamsani06@gmail.com" data-copy-target="heroEmail"><span class="bl">Copy email</span></button>
+          <a class="btn" href="https://www.linkedin.com/in/pujith-yamsani-814762255/" target="_blank" rel="noopener">LinkedIn &#8599;</a>
+          <a class="btn" href="Yamsani_Pujith_Resume.pdf" download>Resume &#8595;</a>
+        </div>
+      </div>
+
+      <div class="console" aria-label="Interactive pipeline demo">
+        <div class="console-bar">
+          <span>demo_pipeline &middot; raw data &rarr; reports</span>
+          <span class="status" id="runStatus" data-s="idle">IDLE</span>
+        </div>
+        <p class="hint">Run a batch and watch rows move through the layers. Switch on bad rows to see the quality gate catch them.</p>
+        <div class="canvas-box">
+          <canvas id="flow" role="img" aria-label="Rows flow from source systems through Bronze, Silver and Gold layers into reports. Rows that fail quality checks at Silver are moved to quarantine."></canvas>
+        </div>
+        <div class="legend" aria-label="Pipeline stages">
+          <button type="button" data-stage="src" aria-pressed="false" style="--c:var(--muted)"><span class="sw"></span>Sources</button>
+          <button type="button" data-stage="bronze" aria-pressed="false" style="--c:var(--bronze)"><span class="sw"></span>Bronze</button>
+          <button type="button" data-stage="silver" aria-pressed="true" style="--c:var(--silver)"><span class="sw"></span>Silver</button>
+          <button type="button" data-stage="gold" aria-pressed="false" style="--c:var(--gold)"><span class="sw"></span>Gold</button>
+          <button type="button" data-stage="bi" aria-pressed="false" style="--c:var(--flow)"><span class="sw"></span>Reports</button>
+          <button type="button" data-stage="q" aria-pressed="false" style="--c:var(--bad)"><span class="sw"></span>Quarantine</button>
+        </div>
+        <p class="stage-note" id="stageNote" aria-live="polite"><b>Silver.</b> Data is cleaned and checked. Rows with missing keys, duplicates or bad dates are pulled aside here.</p>
+        <div class="controls">
+          <button class="btn primary small" id="runBtn" type="button">Run a batch</button>
+          <label class="switch" for="badToggle"><input type="checkbox" id="badToggle">Send bad rows</label>
+        </div>
+        <dl class="counters">
+          <div><dt>Rows in</dt><dd id="cIn">0</dd></div>
+          <div class="rej"><dt>Rejected</dt><dd id="cRej">0</dd></div>
+          <div class="pub"><dt>Published</dt><dd id="cPub">0</dd></div>
+        </dl>
+        <ol class="log" id="log" aria-live="polite" aria-label="Run log">
+          <li><span class="t">ready&nbsp;</span>pipeline ready &middot; press Run a batch</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="work">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">Experience</p>
+          <h2>Building PepsiCo&rsquo;s data pipelines</h2>
+        </div>
+        <p class="sec-intro">I joined Cliff Systems LLP as a Data Engineer in August 2025 and work on PepsiCo&rsquo;s enterprise data modernization program.</p>
+      </div>
+      <article class="job">
+        <div>
+          <h3>Data Engineer</h3>
+          <p class="org">Cliff Systems LLP</p>
+          <p class="client">Client: <strong>PepsiCo</strong></p>
+          <dl class="kv">
+            <div><dt>Since</dt><dd>Aug 2025</dd></div>
+            <div><dt>Uptime</dt><dd id="uptime">1 yr 3 mo</dd></div>
+            <div><dt>Location</dt><dd>Hyderabad</dd></div>
+            <div><dt>Status</dt><dd><span class="status" data-s="running">RUNNING</span></dd></div>
+          </dl>
+        </div>
+        <ul class="ticks">
+          <li>Work on PepsiCo&rsquo;s enterprise data modernization program, building and maintaining cloud data pipelines with Azure Databricks, Azure Data Factory (ADF), PySpark, and SQL.</li>
+          <li>Turn raw data from SAP, Oracle, and retailer files into clean, report-ready data that business teams use in Power BI and Tableau dashboards.</li>
+          <li>Delivered sales and inventory reporting for 5 major retail chains, including a fix for 53-week calendar years that kept year-over-year sales comparisons accurate.</li>
+          <li>Set up incremental loading so pipelines process only new or changed data, cutting run time and cloud costs.</li>
+          <li>Schedule and monitor jobs in Control-M, tracing how data flows between systems to quickly fix production issues such as late or corrupted source files.</li>
+          <li>Support releases across development, testing, and production, fixing testing defects before changes go live.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">Projects</p>
+          <h2>Two pipelines, start to finish</h2>
+        </div>
+        <p class="sec-intro">Both are for PepsiCo and run on Azure Databricks, through the same Bronze, Silver and Gold layers as the demo above.</p>
+      </div>
+      <div class="projects">
+        <article class="project">
+          <div>
+            <p class="eyebrow">Supply chain &middot; PepsiCo</p>
+            <h3 style="margin-top:8px">Supply Chain Planning Data Platform</h3>
+            <p class="pl">Planning teams needed one place to see forecasts, orders and inventory. That data lived in Oracle, SAP and other systems.</p>
+          </div>
+          <ol class="lineage" aria-label="Data flow">
+            <li><span>Oracle &middot; SAP &middot; more</span></li>
+            <li><span style="--c:var(--bronze)">Bronze</span></li>
+            <li><span style="--c:var(--silver)">Silver</span></li>
+            <li><span style="--c:var(--gold)">Gold</span></li>
+            <li><span style="--c:var(--flow)">Power BI &middot; Tableau</span></li>
+          </ol>
+          <dl class="stats">
+            <div><dt>datasets brought together</dt><dd>600&ndash;800</dd></div>
+            <div><dt>environments kept stable: dev, test, prod</dt><dd>3</dd></div>
+          </dl>
+          <ul class="ticks">
+            <li>Built pipelines that bring together data from Oracle, SAP and other business systems into one reliable view for planners.</li>
+            <li>Added data quality checks to catch missing, duplicate or incorrect rows before they reach business reports.</li>
+            <li>Reworked logic that kept causing data errors, so pipelines stay stable across development, testing and production.</li>
+            <li>Built KPI reporting tables for Power BI and Tableau to help planners track supply chain performance.</li>
+          </ul>
+          <ul class="stack" aria-label="Tools">
+            <li>Azure Databricks</li><li>Azure Data Factory</li><li>PySpark</li><li>SQL</li>
+          </ul>
+        </article>
+
+        <article class="project">
+          <div>
+            <p class="eyebrow">Migration &middot; PepsiCo</p>
+            <h3 style="margin-top:8px">Teradata to Azure Migration</h3>
+            <p class="pl">PepsiCo was retiring its legacy Teradata warehouse. Sales and wholesale data had to move to Azure Databricks with nothing lost on the way.</p>
+          </div>
+          <ol class="lineage" aria-label="Data flow">
+            <li><span>Teradata &middot; SAP</span></li>
+            <li><span style="--c:var(--bronze)">Bronze</span></li>
+            <li><span style="--c:var(--silver)">Silver</span></li>
+            <li><span style="--c:var(--gold)">Gold</span></li>
+            <li><span style="--c:var(--flow)">Power BI &middot; Tableau</span></li>
+          </ol>
+          <dl class="stats">
+            <div><dt>accuracy and completeness confirmed</dt><dd>100%</dd></div>
+            <div><dt>raw data backup for reloads</dt><dd>90 days</dd></div>
+          </dl>
+          <div class="recon" aria-label="Reconciliation check">
+            <div class="recon-head">
+              <span>Teradata</span><span class="vs">vs</span><span>Azure Databricks</span>
+              <button class="btn small" id="reconBtn" type="button">Run the check again</button>
+            </div>
+            <ul class="checks" id="checks">
+              <li data-state="done"><span class="mark" aria-hidden="true"></span>Row counts match</li>
+              <li data-state="done"><span class="mark" aria-hidden="true"></span>Totals match on key amounts</li>
+              <li data-state="done"><span class="mark" aria-hidden="true"></span>No missing rows</li>
+              <li data-state="done"><span class="mark" aria-hidden="true"></span>No duplicate rows</li>
+              <li data-state="done"><span class="mark" aria-hidden="true"></span>Business logic gives the same results</li>
+            </ul>
+            <p class="recon-result" id="reconResult" aria-live="polite">Result: 100% match, accurate and complete</p>
+          </div>
+          <ul class="ticks">
+            <li>Moved large volumes of sales and wholesale data from Teradata to Azure Databricks, helping PepsiCo retire Teradata.</li>
+            <li>Loaded raw SAP data with a 90-day backup, so any load could be recovered or reprocessed.</li>
+            <li>Rewrote Teradata business logic in PySpark and SQL and built report-ready tables for Power BI and Tableau.</li>
+            <li>Compared migrated data against Teradata and confirmed 100% accuracy and completeness.</li>
+          </ul>
+          <ul class="stack" aria-label="Tools">
+            <li>Teradata</li><li>Azure Databricks</li><li>Azure Data Factory</li><li>PySpark</li><li>SQL</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="skills">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">Skills</p>
+          <h2>Query my toolbox</h2>
+        </div>
+        <p class="sec-intro">Pick a table to run its query. Each row is a tool and how I use it.</p>
+      </div>
+      <div class="sql">
+        <div class="sql-tabs" id="sqlTabs" aria-label="Skill tables"></div>
+        <pre class="sql-query" id="sqlQuery" aria-live="polite"></pre>
+        <div class="sql-result">
+          <table id="sqlTable"><thead></thead><tbody></tbody></table>
+        </div>
+        <div class="sql-foot" id="sqlFoot"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="education">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow">Education</p>
+          <h2>How I got here</h2>
+        </div>
+        <p class="sec-intro">Computer science first, then a Microsoft certification in data engineering, then production data work for PepsiCo.</p>
+      </div>
+      <ol class="timeline">
+        <li style="--c:var(--bronze)"><span class="yr">2018</span><b>Class X</b><span class="where">St. Peter&rsquo;s Public School, Bowenpally</span><span class="score">CGPA 8.80</span></li>
+        <li style="--c:var(--silver)"><span class="yr">2020</span><b>Intermediate (MPC)</b><span class="where">Excellencia Junior College, Kompally</span><span class="score">CGPA 9.14</span></li>
+        <li style="--c:var(--gold)"><span class="yr">2024</span><b>B.Tech, Computer Science and Engineering</b><span class="where">B V Raju Institute of Technology, Narsapur</span><span class="score">CGPA 7.78</span></li>
+        <li style="--c:var(--flow)"><span class="yr">2025</span><b>Data Engineer</b><span class="where">Cliff Systems LLP, client PepsiCo</span><span class="score">Aug 2025 &ndash; present</span></li>
+      </ol>
+      <div class="cert">
+        <div class="badge" aria-hidden="true">DE</div>
+        <div class="cert-text">
+          <h3>Microsoft Certified: Azure Data Engineer Associate</h3>
+          <p>Issued by Microsoft. The credential can be checked on Microsoft Learn.</p>
+        </div>
+        <a class="btn" href="https://learn.microsoft.com/api/credentials/share/en-us/YamsaniPujith-4281/505B65DAA4245F8C?sharingId=EEE246401734F596" target="_blank" rel="noopener">Verify credential &#8599;</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block contact" id="contact">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>Hiring a data engineer?</h2>
+        <p class="sec-intro">I&rsquo;m open to Data Engineering roles. Email is the quickest way to reach me. You can also connect on LinkedIn or download my resume.</p>
+      </div>
+      <div class="reach">
+        <div class="reach-row">
+          <div><span class="lbl">Email</span><span class="val" id="contactEmail">pujithyamsani06@gmail.com</span></div>
+          <button class="btn small" type="button" data-copy="pujithyamsani06@gmail.com" data-copy-target="contactEmail"><span class="bl">Copy</span></button>
+        </div>
+        <div class="reach-row">
+          <div><span class="lbl">LinkedIn</span><span class="val">pujith-yamsani-814762255</span></div>
+          <a class="btn small" href="https://www.linkedin.com/in/pujith-yamsani-814762255/" target="_blank" rel="noopener">Open &#8599;</a>
+        </div>
+        <div class="reach-row">
+          <div><span class="lbl">Resume</span><span class="val">PDF &middot; 1 page</span></div>
+          <a class="btn small" href="Yamsani_Pujith_Resume.pdf" download>Download &#8595;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; <span id="year">2026</span> Yamsani Pujith &middot; Hyderabad, India</span>
+    <span>Azure Databricks &middot; Azure Data Factory &middot; PySpark &middot; SQL</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var darkMQ = window.matchMedia("(prefers-color-scheme: dark)");
+  var MONO = '"IBM Plex Mono", ui-monospace, Consolas, monospace';
+
+  /* ---------- Theme ---------- */
+  var themeBtn = document.getElementById("themeBtn");
+  try {
+    var saved = localStorage.getItem("yp-theme");
+    if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved);
+  } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    return t ? t === "dark" : darkMQ.matches;
+  }
+  function syncThemeBtn() {
+    var d = isDark();
+    themeBtn.querySelector(".tl").textContent = d ? "Light" : "Dark";
+    themeBtn.setAttribute("aria-label", d ? "Switch to light theme" : "Switch to dark theme");
+  }
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("yp-theme", next); } catch (e) {}
+  });
+  function onThemeChange() { syncThemeBtn(); readColors(); draw(); }
+  if (darkMQ.addEventListener) darkMQ.addEventListener("change", onThemeChange);
+  new MutationObserver(onThemeChange).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+  /* ---------- Copy buttons ---------- */
+  function flash(btn, text) {
+    var label = btn.querySelector(".bl") || btn;
+    if (!label.dataset.orig) label.dataset.orig = label.textContent;
+    label.textContent = text;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(function () { label.textContent = label.dataset.orig; }, 1800);
+  }
+  function selectText(el) {
+    try {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch (e) {}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy");
+      var target = document.getElementById(btn.getAttribute("data-copy-target") || "");
+      var p;
+      try { p = navigator.clipboard.writeText(text); } catch (e) { p = Promise.reject(e); }
+      Promise.resolve(p).then(function () { flash(btn, "Copied"); }, function () {
+        if (target) selectText(target);
+        flash(btn, "Selected, press Ctrl+C");
+      });
+    });
+  });
+
+  /* ---------- Uptime + year ---------- */
+  (function () {
+    var start = new Date(2025, 7, 1), now = new Date();
+    var m = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+    if (m < 0) m = 0;
+    var y = Math.floor(m / 12), mo = m % 12;
+    document.getElementById("uptime").textContent = (y ? y + " yr " : "") + mo + " mo";
+    document.getElementById("year").textContent = now.getFullYear();
+  })();
+
+  /* ---------- Pipeline demo ---------- */
+  var canvas = document.getElementById("flow");
+  var ctx = canvas.getContext("2d");
+  var noteEl = document.getElementById("stageNote");
+  var logEl = document.getElementById("log");
+  var runBtn = document.getElementById("runBtn");
+  var badToggle = document.getElementById("badToggle");
+  var statusEl = document.getElementById("runStatus");
+  var cIn = document.getElementById("cIn"), cRej = document.getElementById("cRej"), cPub = document.getElementById("cPub");
+
+  var STAGES = {
+    src:    { name: "Sources",    sub: "SAP · Oracle",  tok: "--muted",  note: "Data arrives from SAP, Oracle, retailer files and the legacy Teradata warehouse." },
+    bronze: { name: "Bronze",     sub: "raw copy",      tok: "--bronze", note: "Raw data lands here exactly as it arrived. A 90-day backup means any load can be replayed." },
+    silver: { name: "Silver",     sub: "checked",       tok: "--silver", note: "Data is cleaned and checked. Rows with missing keys, duplicates or bad dates are pulled aside here." },
+    gold:   { name: "Gold",       sub: "report-ready",  tok: "--gold",   note: "Business rules shape clean data into report-ready tables, like sales by retailer and week." },
+    bi:     { name: "Reports",    sub: "Power BI",      tok: "--flow",   note: "Power BI and Tableau dashboards read from Gold, so business teams get numbers they can trust." },
+    q:      { name: "Quarantine", sub: "0 rows",        tok: "--bad",    note: "Rejected rows wait here for review instead of reaching a report." }
+  };
+  var ORDER = ["src", "bronze", "silver", "gold", "bi", "q"];
+  var GOOD = ["src", "bronze", "silver", "gold", "bi"];
+  var BAD = ["src", "bronze", "silver", "q"];
+  var REASONS = ["missing key", "duplicate", "bad date"];
+  var SEG_COLOR = ["--muted", "--bronze", "--silver", "--gold"];
+
+  var col = {};
+  function readColors() {
+    var cs = getComputedStyle(root);
+    ["--ink", "--muted", "--rule", "--panel", "--flow", "--bronze", "--silver", "--gold", "--bad", "--ok", "--bg"].forEach(function (k) {
+      col[k] = cs.getPropertyValue(k).trim();
+    });
+  }
+
+  var W = 0, H = 236, vertical = false, pos = {};
+  var dash = 0, hover = null, selected = "silver", glow = {};
+  var parts = [], batchNo = 0, current = null, spawnAcc = 0;
+  var counts = { inn: 0, rej: 0, pub: 0 };
+
+  function layout() {
+    var w = Math.round(canvas.parentElement.clientWidth);
+    if (!w) return;
+    W = w;
+    vertical = W < 520;
+    H = vertical ? 460 : 236;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var pad = 14;
+    if (!vertical) {
+      var nw = Math.min(112, (W - pad * 2) / 5 - 10);
+      var step = (W - pad * 2 - nw) / 4;
+      GOOD.forEach(function (id, i) { pos[id] = { x: pad + nw / 2 + step * i, y: 66, w: nw, h: 54 }; });
+      pos.q = { x: pos.silver.x, y: 190, w: nw + 14, h: 46 };
+    } else {
+      var qw = Math.min(118, W * 0.32);
+      var mw = Math.min(190, W - pad * 2 - qw - 28);
+      var vstep = (H - 84) / 4;
+      GOOD.forEach(function (id, i) { pos[id] = { x: pad + mw / 2, y: 42 + vstep * i, w: mw, h: 48 }; });
+      pos.q = { x: W - pad - qw / 2, y: pos.silver.y, w: qw, h: 46 };
+    }
+    draw();
+  }
+
+  function rr(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function fitFont(text, max, weight, size) {
+    var fs = size;
+    while (fs > 8) {
+      ctx.font = weight + " " + fs + "px " + MONO;
+      if (ctx.measureText(text).width <= max) return;
+      fs -= 0.5;
+    }
+  }
+  function line(a, b) {
+    ctx.beginPath(); ctx.moveTo(pos[a].x, pos[a].y); ctx.lineTo(pos[b].x, pos[b].y); ctx.stroke();
+  }
+  function drawNode(id) {
+    var p = pos[id], s = STAGES[id];
+    if (!p) return;
+    var x = p.x - p.w / 2, y = p.y - p.h / 2;
+    var g = glow[id] || 0;
+    if (g > 0.02) {
+      ctx.save(); ctx.globalAlpha = g * 0.3; ctx.fillStyle = col[s.tok];
+      rr(x - 5, y - 5, p.w + 10, p.h + 10, 9); ctx.fill(); ctx.restore();
+    }
+    ctx.fillStyle = col["--panel"]; rr(x, y, p.w, p.h, 6); ctx.fill();
+    ctx.lineWidth = id === selected ? 2 : 1;
+    ctx.strokeStyle = id === selected ? col["--flow"] : (id === hover ? col["--muted"] : col["--rule"]);
+    ctx.stroke();
+    ctx.save(); rr(x, y, p.w, p.h, 6); ctx.clip(); ctx.fillStyle = col[s.tok]; ctx.fillRect(x, y, p.w, 4); ctx.restore();
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = col["--ink"]; fitFont(s.name, p.w - 12, 600, 12.5); ctx.fillText(s.name, p.x, p.y - 5);
+    var sub = id === "q" ? counts.rej + (counts.rej === 1 ? " row" : " rows") : s.sub;
+    ctx.fillStyle = col["--muted"]; fitFont(sub, p.w - 12, 400, 10.5); ctx.fillText(sub, p.x, p.y + 11);
+  }
+  function ppos(p) {
+    var A = pos[p.route[p.seg]], B = pos[p.route[p.seg + 1]];
+    var x = A.x + (B.x - A.x) * p.t, y = A.y + (B.y - A.y) * p.t;
+    var dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1;
+    return [x - dy / L * p.off, y + dx / L * p.off];
+  }
+  function draw() {
+    if (!W || !pos.q) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.lineWidth = 1.5; ctx.setLineDash([4, 6]); ctx.lineDashOffset = -dash;
+    ctx.strokeStyle = col["--rule"];
+    for (var i = 0; i < GOOD.length - 1; i++) line(GOOD[i], GOOD[i + 1]);
+    ctx.strokeStyle = col["--bad"]; ctx.globalAlpha = 0.55; line("silver", "q");
+    ctx.restore();
+    ctx.font = "500 10.5px " + MONO; ctx.fillStyle = col["--bad"];
+    if (!vertical) {
+      ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText("quality gate", pos.silver.x + 9, (pos.silver.y + pos.silver.h / 2 + pos.q.y - pos.q.h / 2) / 2);
+    } else {
+      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      ctx.fillText("quality gate", pos.q.x, pos.q.y - pos.q.h / 2 - 7);
+    }
+    for (var j = 0; j < parts.length; j++) {
+      var p = parts[j], xy = ppos(p);
+      var c = p.flagged ? col["--bad"] : col[SEG_COLOR[Math.min(p.seg, 3)]];
+      if (p.bad && !p.flagged) {
+        ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.strokeRect(xy[0] - 2.75, xy[1] - 2.75, 5.5, 5.5);
+      } else {
+        ctx.fillStyle = c; ctx.fillRect(xy[0] - 3, xy[1] - 3, 6, 6);
+      }
+    }
+    ORDER.forEach(drawNode);
+  }
+
+  function hit(ev) {
+    var r = canvas.getBoundingClientRect();
+    var x = ev.clientX - r.left, y = ev.clientY - r.top;
+    for (var i = 0; i < ORDER.length; i++) {
+      var p = pos[ORDER[i]];
+      if (p && Math.abs(x - p.x) <= p.w / 2 && Math.abs(y - p.y) <= p.h / 2) return ORDER[i];
+    }
+    return null;
+  }
+  canvas.addEventListener("pointermove", function (ev) {
+    var h = hit(ev);
+    if (h !== hover) { hover = h; canvas.style.cursor = h ? "pointer" : "default"; draw(); }
+  });
+  canvas.addEventListener("pointerleave", function () { hover = null; draw(); });
+  canvas.addEventListener("click", function (ev) { var h = hit(ev); if (h) select(h); });
+
+  var legendBtns = Array.prototype.slice.call(document.querySelectorAll("[data-stage]"));
+  function select(id) {
+    selected = id;
+    var s = STAGES[id];
+    noteEl.textContent = "";
+    var b = document.createElement("b"); b.textContent = s.name + ". ";
+    noteEl.appendChild(b);
+    noteEl.appendChild(document.createTextNode(s.note));
+    legendBtns.forEach(function (btn) { btn.setAttribute("aria-pressed", btn.dataset.stage === id ? "true" : "false"); });
+    draw();
+  }
+  legendBtns.forEach(function (btn) { btn.addEventListener("click", function () { select(btn.dataset.stage); }); });
+
+  function renderCounts() { cIn.textContent = counts.inn; cRej.textContent = counts.rej; cPub.textContent = counts.pub; }
+  function stamp() {
+    var d = new Date();
+    return [d.getHours(), d.getMinutes(), d.getSeconds()].map(function (n) { return String(n).padStart(2, "0"); }).join(":");
+  }
+  function log(text, cls) {
+    var li = document.createElement("li");
+    var t = document.createElement("span"); t.className = "t"; t.textContent = stamp() + " ";
+    var m = document.createElement("span"); if (cls) m.className = cls; m.textContent = text;
+    li.appendChild(t); li.appendChild(m); logEl.appendChild(li);
+    while (logEl.children.length > 14) logEl.removeChild(logEl.firstChild);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function setStatus(s) {
+    statusEl.dataset.s = s;
+    statusEl.textContent = s === "running" ? "RUNNING" : s === "ok" ? "SUCCEEDED" : "IDLE";
+  }
+  function pad4(n) { return String(n).padStart(4, "0"); }
+  function pick() { return REASONS[Math.floor(Math.random() * REASONS.length)]; }
+
+  function runBatch() {
+    if (current) return;
+    batchNo++;
+    var n = 36 + Math.floor(Math.random() * 16);
+    current = { id: batchNo, total: n, spawned: 0, done: 0, rej: 0, pub: 0, reasons: {}, bad: badToggle.checked ? 0.3 : 0.05, t0: performance.now() };
+    runBtn.disabled = true;
+    setStatus("running");
+    log("batch " + pad4(batchNo) + " started · " + n + " rows from SAP, Oracle and retail files");
+    if (reduce) {
+      for (var i = 0; i < n; i++) {
+        counts.inn++;
+        if (Math.random() < current.bad) {
+          var r = pick(); counts.rej++; current.rej++; current.reasons[r] = (current.reasons[r] || 0) + 1;
+        } else { counts.pub++; current.pub++; }
+      }
+      current.spawned = current.done = n;
+      renderCounts(); complete(current); draw();
+    } else {
+      spawnAcc = 0.07;
+      ensureLoop();
+    }
+  }
+  function spawnOne(b) {
+    var bad = Math.random() < b.bad;
+    parts.push({ route: bad ? BAD : GOOD, seg: 0, t: 0, off: (Math.random() * 2 - 1) * 7, bad: bad, flagged: false, b: b, reason: bad ? pick() : null, dur: 0.7 + Math.random() * 0.3 });
+    b.spawned++;
+  }
+  function arrive(p, at) {
+    glow[at] = 1;
+    if (at === "bronze") counts.inn++;
+    else if (at === "silver" && p.bad) p.flagged = true;
+    else if (at === "bi") { counts.pub++; p.b.pub++; }
+    else if (at === "q") { counts.rej++; p.b.rej++; p.b.reasons[p.reason] = (p.b.reasons[p.reason] || 0) + 1; }
+    renderCounts();
+  }
+  function complete(b) {
+    var secs = ((performance.now() - b.t0) / 1000).toFixed(1);
+    if (b.rej) {
+      var why = Object.keys(b.reasons).map(function (k) { return b.reasons[k] + " " + k; }).join(", ");
+      log("quality gate · " + b.rej + " rejected (" + why + ")", "bad");
+    } else {
+      log("quality gate · all rows passed", "ok");
+    }
+    log("gold · " + b.pub + " rows published to Power BI");
+    log("batch " + pad4(b.id) + " SUCCEEDED in " + secs + "s", "ok");
+    current = null;
+    runBtn.disabled = false;
+    setStatus("ok");
+  }
+  function tick(dt) {
+    if (current && current.spawned < current.total) {
+      spawnAcc += dt;
+      while (spawnAcc >= 0.07 && current.spawned < current.total) { spawnOne(current); spawnAcc -= 0.07; }
+    }
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i];
+      p.t += dt / p.dur;
+      if (p.t >= 1) {
+        p.seg++; p.t = 0;
+        arrive(p, p.route[p.seg]);
+        if (p.seg >= p.route.length - 1) {
+          parts.splice(i, 1);
+          p.b.done++;
+          if (p.b.done === p.b.total) complete(p.b);
+        }
+      }
+    }
+    for (var k in glow) glow[k] = Math.max(0, glow[k] - dt * 3);
+    dash += dt * 16;
+  }
+
+  var raf = 0, last = 0, onScreen = true;
+  function frame(ts) {
+    var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016;
+    last = ts;
+    tick(dt); draw();
+    if (onScreen && !document.hidden) raf = requestAnimationFrame(frame);
+    else { raf = 0; last = 0; }
+  }
+  function ensureLoop() {
+    if (!raf && !reduce && onScreen && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); }
+  }
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; if (onScreen) ensureLoop(); }).observe(canvas);
+  }
+  document.addEventListener("visibilitychange", ensureLoop);
+
+  runBtn.addEventListener("click", runBatch);
+  badToggle.addEventListener("change", function () {
+    log(badToggle.checked ? "bad rows on · about 3 in 10 rows will fail checks" : "bad rows off · back to normal data", badToggle.checked ? "bad" : "");
+  });
+
+  var lastW = 0;
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(function () {
+      var w = Math.round(canvas.parentElement.clientWidth);
+      if (w !== lastW) { lastW = w; layout(); }
+    }).observe(canvas.parentElement);
+  } else {
+    window.addEventListener("resize", layout);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+
+  readColors();
+  syncThemeBtn();
+  layout();
+  renderCounts();
+  ensureLoop();
+  if (!reduce) setTimeout(runBatch, 900);
+
+  /* ---------- Reconciliation check ---------- */
+  var reconItems = Array.prototype.slice.call(document.querySelectorAll("#checks li"));
+  var reconRes = document.getElementById("reconResult");
+  var reconBtn = document.getElementById("reconBtn");
+  var reconTimer = 0;
+  reconBtn.addEventListener("click", function () {
+    clearTimeout(reconTimer);
+    reconItems.forEach(function (li) { li.dataset.state = "pending"; });
+    reconRes.hidden = true;
+    reconBtn.disabled = true;
+    var i = 0;
+    (function next() {
+      if (i > 0) reconItems[i - 1].dataset.state = "done";
+      if (i < reconItems.length) {
+        reconItems[i].dataset.state = "running"; i++;
+        reconTimer = setTimeout(next, reduce ? 0 : 520);
+      } else {
+        reconRes.hidden = false;
+        reconBtn.disabled = false;
+      }
+    })();
+  });
+
+  /* ---------- Skills console ---------- */
+  var CRED = "https://learn.microsoft.com/api/credentials/share/en-us/YamsaniPujith-4281/505B65DAA4245F8C?sharingId=EEE246401734F596";
+  function skillQuery(area) { return "SELECT tool, how_i_use_it\nFROM pujith.skills\nWHERE area = '" + area + "';"; }
+  var TABLES = [
+    { key: "cloud", q: skillQuery("cloud"), cols: ["tool", "how_i_use_it"], rows: [
+      ["Azure Databricks", "Clean and transform data with PySpark and SQL"],
+      ["Azure Data Factory", "Build, schedule and run data pipelines"],
+      ["Azure Data Lake Storage", "Store raw and cleaned data across Bronze, Silver and Gold"],
+      ["Delta Lake", "Reliable tables for the cleaned and report-ready layers"],
+      ["Unity Catalog", "Organize tables and control who can access them"],
+      ["Azure Synapse Analytics", "Load clean data for reporting (personal project)"],
+      ["Azure Key Vault", "Keep connection secrets safe (personal project)"]
+    ] },
+    { key: "languages", q: skillQuery("languages"), cols: ["tool", "how_i_use_it"], rows: [
+      ["PySpark", "Large-scale transformations in Databricks"],
+      ["SQL and Spark SQL", "Business logic, data checks and reporting tables"],
+      ["Python", "Scripting and data handling"],
+      ["Teradata SQL", "Reading legacy warehouse logic so it can be rebuilt on Azure"]
+    ] },
+    { key: "warehousing", q: skillQuery("warehousing"), cols: ["tool", "how_i_use_it"], rows: [
+      ["Medallion architecture", "Bronze, Silver and Gold layers, so data gets cleaner at each step"],
+      ["ETL / ELT", "Pipelines that extract, load and transform data"],
+      ["Data modeling", "Tables that reports can query quickly and correctly"],
+      ["Teradata", "Legacy warehouse I migrated data from"],
+      ["SQL Server and MySQL", "Relational databases I have worked with"]
+    ] },
+    { key: "data quality", q: skillQuery("data quality"), cols: ["tool", "how_i_use_it"], rows: [
+      ["Data validation", "Catch missing, duplicate or broken rows before they reach reports"],
+      ["Reconciliation", "Prove migrated data matches the source"],
+      ["Data lineage", "Trace where each number in a report came from"],
+      ["Root-cause analysis", "Find why a pipeline failed and fix it for good"]
+    ] },
+    { key: "orchestration", q: skillQuery("orchestration"), cols: ["tool", "how_i_use_it"], rows: [
+      ["Azure Data Factory", "Run pipelines end to end, in the right order"],
+      ["Control-M", "Schedule and monitor production jobs"],
+      ["Azure DevOps and Git", "Version control and releases"],
+      ["CI/CD", "Move changes from development to testing to production"]
+    ] },
+    { key: "reporting", q: skillQuery("reporting"), cols: ["tool", "how_i_use_it"], rows: [
+      ["Power BI", "Dashboards built on Gold tables"],
+      ["Tableau", "Dashboards fed by report-ready data I prepare"],
+      ["SQL Server Management Studio", "Querying and checking data"]
+    ] },
+    { key: "certifications", q: "SELECT name, issued_by, verify\nFROM pujith.certifications;", cols: ["name", "issued_by", "verify"], rows: [
+      ["Azure Data Engineer Associate", "Microsoft", { href: CRED, text: "Microsoft Learn ↗" }]
+    ] }
+  ];
+  var tabsEl = document.getElementById("sqlTabs");
+  var qEl = document.getElementById("sqlQuery");
+  var tHead = document.querySelector("#sqlTable thead");
+  var tBody = document.querySelector("#sqlTable tbody");
+  var foot = document.getElementById("sqlFoot");
+  var typeTok = 0;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function hl(q) {
+    return esc(q)
+      .replace(/(&#39;[^&]*?&#39;)/g, '<span class="s">$1</span>')
+      .replace(/\b(SELECT|FROM|WHERE)\b/g, '<span class="k">$1</span>');
+  }
+  function renderTable(t, animate) {
+    tHead.innerHTML = "<tr>" + t.cols.map(function (c) { return '<th scope="col">' + esc(c) + "</th>"; }).join("") + "</tr>";
+    tBody.innerHTML = t.rows.map(function (r, i) {
+      return "<tr" + (animate ? ' class="in" style="--r:' + i + '"' : "") + ">" + r.map(function (v) {
+        if (v && v.href) return '<td><a href="' + esc(v.href) + '" target="_blank" rel="noopener">' + esc(v.text) + "</a></td>";
+        return "<td>" + esc(v) + "</td>";
+      }).join("") + "</tr>";
+    }).join("");
+    tBody.classList.remove("stale");
+    foot.textContent = t.rows.length + (t.rows.length === 1 ? " row" : " rows") + " returned";
+  }
+  var tabBtns = TABLES.map(function (t, i) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = t.key;
+    btn.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+    btn.addEventListener("click", function () { runQuery(i, true); });
+    tabsEl.appendChild(btn);
+    return btn;
+  });
+  function runQuery(i, animate) {
+    var t = TABLES[i], my = ++typeTok;
+    tabBtns.forEach(function (b, j) { b.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    if (!animate || reduce) { qEl.innerHTML = hl(t.q); renderTable(t, false); return; }
+    tBody.classList.add("stale");
+    foot.textContent = "running query…";
+    var n = 0;
+    (function type() {
+      if (my !== typeTok) return;
+      n += 2;
+      qEl.textContent = t.q.slice(0, n);
+      var caret = document.createElement("span"); caret.className = "caret"; qEl.appendChild(caret);
+      if (n < t.q.length) { setTimeout(type, 16); return; }
+      qEl.innerHTML = hl(t.q);
+      setTimeout(function () { if (my === typeTok) renderTable(t, true); }, 140);
+    })();
+  }
+  runQuery(0, false);
+})();
+</script>
+</body>
+</html>
